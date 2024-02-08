@@ -1,23 +1,26 @@
-import { Cell } from './cell.js';
-import { Goblin } from './goblin.js';
+import { Cell } from "./cell.js";
+import { Goblin } from "./goblin.js";
+import { Cursor } from "./cursor.js"; // Импорт класса Cursor из файла cursor.js
 
 export class Game {
   constructor() {
-    this.gameContainer = document.getElementById('game-container');
-    this.gameContainer.addEventListener('mouseover', () => this.gameContainer.classList.add('hammer-cursor'));
-    this.gameContainer.addEventListener('mouseout', () => this.gameContainer.classList.remove('hammer-cursor'));
+    this.gameContainer = document.getElementById("game-container");
+    this.cursor = new Cursor(); // Создание экземпляра класса Cursor
+    this.cursor.attachEvents(); // Добавление обработчика события мыши
+
     this.cells = [];
     this.goblins = [];
     this.score = 0;
     this.maxMissedGoblins = 5;
     this.missedGoblins = 0;
     this.intervalId = null;
+    this.clickHandler = this.onClick.bind(this);
   }
 
   start() {
     this.createCells();
     this.intervalId = setInterval(() => this.spawnGoblin(), 1000);
-    this.gameContainer.addEventListener('click', event => this.onClick(event));
+    this.gameContainer.addEventListener("click", this.clickHandler);
   }
 
   createCells() {
@@ -29,7 +32,10 @@ export class Game {
   }
 
   spawnGoblin() {
-    if (this.goblins.length >= this.cells.length || this.missedGoblins >= this.maxMissedGoblins) {
+    if (
+      this.goblins.length >= this.cells.length ||
+      this.missedGoblins >= this.maxMissedGoblins
+    ) {
       this.endGame();
       return;
     }
@@ -44,10 +50,12 @@ export class Game {
   }
 
   onClick(event) {
-    const clickedCell = event.target.closest('.cell');
+    const clickedCell = event.target.closest(".cell");
     if (!clickedCell) return;
 
-    const goblin = this.goblins.find(goblin => goblin.cell.element === clickedCell);
+    const goblin = this.goblins.find(
+      (goblin) => goblin.cell.element === clickedCell
+    );
     if (goblin) {
       this.score++;
       this.removeGoblin(goblin);
@@ -56,12 +64,14 @@ export class Game {
 
   removeGoblin(goblin) {
     goblin.destroy();
-    this.goblins = this.goblins.filter(g => g !== goblin);
+    this.goblins = this.goblins.filter((g) => g !== goblin);
   }
 
   endGame() {
     clearInterval(this.intervalId);
-    this.gameContainer.removeEventListener('click', this.onClick);
+    this.gameContainer.removeEventListener("click", this.clickHandler);
+    this.cursor.detachEvents(); // Удаление обработчика события мыши
+    this.cursor.hideCursor(); // Скрытие кастомного курсора
     alert(`Game over! Your score: ${this.score}`);
   }
 }

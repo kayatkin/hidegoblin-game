@@ -1,7 +1,7 @@
 {
   "name": "hidegoblin-game",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "game.js",
   "repository": "git@github.com:kayatkin/hidegoblin-game.git",
   "author": "kayatkin",
   "license": "MIT",
@@ -22,8 +22,9 @@
     "webpack-dev-server": "^4.15.1"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production",
-    "test": "jest"
+    "start": "yarn webpack-dev-server --mode development",
+    "build": "yarn webpack --mode production",
+    "test": "jest",
+    "gh-pages": "webpack --mode production && copy dist docs"
   }
 }

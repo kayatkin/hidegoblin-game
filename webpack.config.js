@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/game.js',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -14,6 +14,9 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
         },
       },
       {
@@ -21,6 +24,9 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
+            options: {
+                name: '[name].[ext]',
+            },
           },
         ],
       },
@@ -36,6 +42,6 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: './dist',
-  },
+    static: path.join(__dirname, 'dist'),
+  },  
 };
