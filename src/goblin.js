@@ -20,6 +20,6 @@ export class Goblin {
     this.cell.element.removeChild(this.element);
     this.cell.hasGoblin = false;
 
-    this.goblinsArray = this.goblinsArray.filter(goblin => goblin !== this);
+    this.goblinsArray = this.goblinsArray.filter((goblin) => goblin !== this);
   }
 }

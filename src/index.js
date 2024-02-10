@@ -54,15 +54,15 @@ class Game {
   spawnGoblin() {
     const randomCellIndex = Math.floor(Math.random() * this.cells.length);
     const cell = this.cells[randomCellIndex];
-    
+
     if (!cell.hasGoblin) {
       const goblin = new Goblin(cell, this.goblins);
       this.goblins.push(goblin);
-  
+
       cell.hasGoblin = true;
-  
+
       setTimeout(() => {
-        if (!goblin.isCaught) { 
+        if (!goblin.isCaught) {
           this.missedGoblins++;
           this.displayMissedGoblins();
           if (this.missedGoblins >= this.maxMissedGoblins) {
@@ -73,13 +73,14 @@ class Game {
       }, 1000);
     }
   }
-  
-  
+
   onClick(event) {
-    const clickedCell = event.target.closest('.cell');
+    const clickedCell = event.target.closest(".cell");
     if (!clickedCell) return;
 
-    const goblin = this.goblins.find(goblin => goblin.cell.element === clickedCell);
+    const goblin = this.goblins.find(
+      (goblin) => goblin.cell.element === clickedCell
+    );
     if (goblin) {
       this.score++;
       this.removeGoblin(goblin);
@@ -100,10 +101,10 @@ class Game {
       missedElement.innerText = `Missed Goblins: ${this.missedGoblins}/${this.maxMissedGoblins}`;
     }
   }
-  
+
   removeGoblin(goblin) {
     goblin.destroy();
-    this.goblins = this.goblins.filter(g => g !== goblin);
+    this.goblins = this.goblins.filter((g) => g !== goblin);
   }
 
   start() {
@@ -113,7 +114,7 @@ class Game {
 
   endGame() {
     clearInterval(this.intervalId);
-    this.container.removeEventListener('click', this.onClick);
+    this.container.removeEventListener("click", this.onClick);
     alert(`Game over! Your score: ${this.score}`);
   }
 
