@@ -1,7 +1,7 @@
 {
   "name": "hidegoblin-game",
   "version": "1.0.0",
-  "main": "game.js",
+  "main": "index.js",
   "repository": "git@github.com:kayatkin/hidegoblin-game.git",
   "author": "kayatkin",
   "license": "MIT",

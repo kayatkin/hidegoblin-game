@@ -1,77 +1,127 @@
+import "./styles.css";
+import characterImage from "./goblin.png";
 import { Cell } from "./cell.js";
 import { Goblin } from "./goblin.js";
-import { Cursor } from "./cursor.js"; // Импорт класса Cursor из файла cursor.js
+import { Cursor } from "./cursor.js";
 
-export class Game {
-  constructor() {
-    this.gameContainer = document.getElementById("game-container");
-    this.cursor = new Cursor(); // Создание экземпляра класса Cursor
-    this.cursor.attachEvents(); // Добавление обработчика события мыши
-
+class Game {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
     this.cells = [];
     this.goblins = [];
     this.score = 0;
     this.maxMissedGoblins = 5;
     this.missedGoblins = 0;
     this.intervalId = null;
-    this.clickHandler = this.onClick.bind(this);
+    this.init();
   }
 
-  start() {
+  init() {
     this.createCells();
-    this.intervalId = setInterval(() => this.spawnGoblin(), 1000);
-    this.gameContainer.addEventListener("click", this.clickHandler);
+    this.createCharacter();
+    this.start();
+    this.setCursor();
+    this.displayScore();
   }
 
   createCells() {
     for (let i = 0; i < 16; i++) {
       const cell = new Cell();
-      this.gameContainer.appendChild(cell.element);
+      this.container.appendChild(cell.element);
       this.cells.push(cell);
     }
   }
 
-  spawnGoblin() {
-    if (
-      this.goblins.length >= this.cells.length ||
-      this.missedGoblins >= this.maxMissedGoblins
-    ) {
-      this.endGame();
-      return;
-    }
-
-    const randomCellIndex = Math.floor(Math.random() * this.cells.length);
-    const cell = this.cells[randomCellIndex];
-    if (!cell.hasGoblin) {
-      const goblin = new Goblin(cell);
-      this.goblins.push(goblin);
-      setTimeout(() => this.removeGoblin(goblin), 1000);
-    }
+  createCharacter() {
+    this.character = document.createElement("img");
+    this.character.src = characterImage;
+    this.character.style.display = "none";
+    this.container.appendChild(this.character);
   }
 
+  getRandomCell() {
+    const randomIndex = Math.floor(Math.random() * this.cells.length);
+    return this.cells[randomIndex].element;
+  }
+
+  moveCharacter() {
+    const cell = this.getRandomCell();
+    this.character.style.gridRow = cell.style.gridRow;
+    this.character.style.gridColumn = cell.style.gridColumn;
+    this.character.style.display = "block";
+  }
+
+  spawnGoblin() {
+    const randomCellIndex = Math.floor(Math.random() * this.cells.length);
+    const cell = this.cells[randomCellIndex];
+    
+    if (!cell.hasGoblin) {
+      const goblin = new Goblin(cell, this.goblins);
+      this.goblins.push(goblin);
+  
+      cell.hasGoblin = true;
+  
+      setTimeout(() => {
+        if (!goblin.isCaught) { 
+          this.missedGoblins++;
+          this.displayMissedGoblins();
+          if (this.missedGoblins >= this.maxMissedGoblins) {
+            this.endGame();
+          }
+        }
+        this.removeGoblin(goblin);
+      }, 1000);
+    }
+  }
+  
+  
   onClick(event) {
-    const clickedCell = event.target.closest(".cell");
+    const clickedCell = event.target.closest('.cell');
     if (!clickedCell) return;
 
-    const goblin = this.goblins.find(
-      (goblin) => goblin.cell.element === clickedCell
-    );
+    const goblin = this.goblins.find(goblin => goblin.cell.element === clickedCell);
     if (goblin) {
       this.score++;
       this.removeGoblin(goblin);
+      this.displayScore();
     }
   }
 
+  displayScore() {
+    const scoreElement = document.getElementById("score");
+    if (scoreElement) {
+      scoreElement.innerText = `Score: ${this.score}`;
+    }
+  }
+
+  displayMissedGoblins() {
+    const missedElement = document.getElementById("missed");
+    if (missedElement) {
+      missedElement.innerText = `Missed Goblins: ${this.missedGoblins}/${this.maxMissedGoblins}`;
+    }
+  }
+  
   removeGoblin(goblin) {
     goblin.destroy();
-    this.goblins = this.goblins.filter((g) => g !== goblin);
+    this.goblins = this.goblins.filter(g => g !== goblin);
+  }
+
+  start() {
+    this.intervalId = setInterval(() => this.spawnGoblin(), 1000);
+    this.container.addEventListener("click", this.onClick.bind(this));
   }
 
   endGame() {
     clearInterval(this.intervalId);
-    this.gameContainer.removeEventListener("click", this.clickHandler);
-    this.cursor.detachEvents(); // Удаление обработчика события мыши
-    this.cursor.hideCursor(); // Скрытие кастомного курсора
+    this.container.removeEventListener('click', this.onClick);
     alert(`Game over! Your score: ${this.score}`);
   }
+
+  setCursor() {
+    const cursor = new Cursor();
+    cursor.attachEvents();
+    cursor.showCursor();
+  }
 }
+
+const game = new Game("game-container");

@@ -1,13 +1,15 @@
 import characterImage from "./goblin.png";
 
 export class Goblin {
-  constructor(cell) {
+  constructor(cell, goblinsArray) {
     this.element = document.createElement("img");
     this.element.src = characterImage;
     this.element.classList.add("goblin");
     cell.element.appendChild(this.element);
     cell.hasGoblin = true;
     this.cell = cell;
+    this.goblinsArray = goblinsArray;
+    this.destroy = this.destroy.bind(this);
   }
 
   destroy() {
@@ -16,7 +18,8 @@ export class Goblin {
     }
 
     this.cell.element.removeChild(this.element);
-
     this.cell.hasGoblin = false;
+
+    this.goblinsArray = this.goblinsArray.filter(goblin => goblin !== this);
   }
 }
